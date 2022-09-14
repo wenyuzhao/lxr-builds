@@ -1,0 +1,69 @@
+name: MMTk OpenJDK 11 (with LXR)
+
+on:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        debug-level: ["slowdebug", "fastdebug", "release"]
+    name: mmtk-jdk11-lxr-${{ matrix.debug-level }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MMTk/OpenJDK binding
+        uses: actions/checkout@v3
+        with:
+          repository: mmtk/mmtk-openjdk
+          path: ./mmtk-openjdk
+      - name: Extract OpenJDK revision
+        id: extract-openjdk-revision
+        run: echo "::set-output name=openjdk-revision::$(sed -n 's/^openjdk_version.=."\(.*\)"$/\1/p' < mmtk-openjdk/mmtk/Cargo.toml)"
+      - name: Checkout JDK MMTk fork
+        uses: actions/checkout@v3
+        with:
+          repository: mmtk/openjdk
+          path: ./openjdk
+          ref: ${{ steps.extract-openjdk-revision.outputs.openjdk-revision }}
+      - name: Install latest stable Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - name: Install build dependencies
+        run: >
+          sudo apt-get update &&
+          sudo apt-get install -y
+          build-essential
+          libfreetype6-dev
+          libcups2-dev
+          libx11-dev libxext-dev libxrender-dev libxrandr-dev libxtst-dev libxt-dev
+          libasound2-dev
+          libffi-dev
+          autoconf
+          zip
+          unzip
+          libfontconfig1-dev
+          pigz
+      - name: Configure OpenJDK
+        run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }}
+        working-directory: ./openjdk
+      - name: Build OpenJDK
+        run: make CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
+        working-directory: ./openjdk
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: jdk11-mmtk-lxr-${{ matrix.debug-level }}-bundles
+          path: ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*
+      - name: Find bundle file
+        id: find-file
+        run: echo "::set-output name=bundle-name::$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)"
+      - name: Upload bundle
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: ${{ steps.find-file.outputs.bundle-name }}
+          release_id: nightly
+          overwrite: true
