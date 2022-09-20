@@ -8,6 +8,7 @@ jobs:
     strategy:
       matrix:
         debug-level: ["slowdebug"]
+        variant: ["mmtk-lxr"]
     name: jdk11-mmtk-lxr-${{ matrix.debug-level }}
     runs-on: ubuntu-latest
     steps:
@@ -58,12 +59,16 @@ jobs:
           path: ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*
       - name: Find bundle file
         id: find-file
-        run: echo "::set-output name=bundle-name::$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)"
+        run: |
+          bundle_name=$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)
+          current_date=$(date +'%Y%m%d')
+          mv $bundle_name ./openjdk-jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}-$current_date.tar.gz
+          echo "::set-output name=bundle-file::$(ls ./openjdk-*.tar.gz)"
       - name: Upload bundle
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ${{ steps.find-file.outputs.bundle-name }}
+          file: ${{ steps.find-file.outputs.bundle-file }}
           release_id: 77066034
           overwrite: true
