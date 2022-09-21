@@ -12,30 +12,6 @@ jobs:
     name: jdk11-mmtk-lxr-${{ matrix.debug-level }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout MMTk/OpenJDK binding
-        uses: actions/checkout@v3
-        with:
-          repository: mmtk/mmtk-openjdk
-          path: ./mmtk-openjdk
-      - name: Extract MMTk-OpenJDK revision
-        id: extract-mmtk-openjdk-revision
-        run: |
-          cd ./mmtk-openjdk
-          echo "::set-output name=mmtk-openjdk-revision::$(git rev-parse HEAD)"
-      - name: Extract OpenJDK revision
-        id: extract-openjdk-revision
-        run: echo "::set-output name=openjdk-revision::$(sed -n 's/^openjdk_version.=."\(.*\)"$/\1/p' < mmtk-openjdk/mmtk/Cargo.toml)"
-      - name: Checkout JDK MMTk fork
-        uses: actions/checkout@v3
-        with:
-          repository: mmtk/openjdk
-          path: ./openjdk
-          ref: ${{ steps.extract-openjdk-revision.outputs.openjdk-revision }}
-      - name: Install latest stable Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
       - name: Install build dependencies
         run: >
           sudo apt-get update &&
@@ -51,11 +27,54 @@ jobs:
           unzip
           libfontconfig1-dev
           pigz
+      - name: Checkout MMTk/OpenJDK binding
+        uses: actions/checkout@v3
+        with:
+          repository: mmtk/mmtk-openjdk
+          path: ./mmtk-openjdk
+      - name: Extract date and revisions
+        id: revisions
+        run: |
+          # Get current date
+          current_datetime=$(date)
+          current_date=$(date +'%Y%m%d')
+          # Get openjdk revision
+          openjdk_revision=$(sed -n 's/^openjdk_version.=."\(.*\)"$/\1/p' < mmtk-openjdk/mmtk/Cargo.toml)
+          # Get mmtk-openjdk revision
+          pushd ./mmtk-openjdk
+          mmtk_openjdk_revision=$(git rev-parse HEAD)
+          popd
+          # Output variables
+          echo "::set-output name=datetime::$current_datetime"
+          echo "::set-output name=date::$current_date"
+          echo "::set-output name=openjdk-revision::$openjdk_revision"
+          echo "::set-output name=mmtk-openjdk-revision::$mmtk_openjdk_revision"
+      - name: Generate versions.yml
+        id: versions-yml
+        run: |
+          echo "date: ${{ steps.revisions.outputs.datetime }}" > ./versions.yml
+          echo "variant: ${{ matrix.debug-level }}, ${{ matrix.variant }}" >> ./versions.yml
+          echo "openjdk: ${{ steps.revisions.outputs.openjdk-revision }}" >> ./versions.yml
+          echo "mmtk-openjdk: ${{ steps.revisions.outputs.mmtk-openjdk-revision }}" >> ./versions.yml
+          echo "::set-output name=file::./versions.yml"
+      - name: Checkout JDK MMTk fork
+        uses: actions/checkout@v3
+        with:
+          repository: mmtk/openjdk
+          path: ./openjdk
+          ref: ${{ steps.revisions.outputs.openjdk-revision }}
+      - name: Install latest stable Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
       - name: Configure OpenJDK
         run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }}
         working-directory: ./openjdk
       - name: Build OpenJDK
-        run: make CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
+        run: |
+          make CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
+          cp ${{ steps.versions-yml.outputs.file }} ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
         working-directory: ./openjdk
       - name: Upload as artifact
         uses: actions/upload-artifact@v3
@@ -63,37 +82,37 @@ jobs:
           name: jdk11-mmtk-lxr-${{ matrix.debug-level }}-bundles
           path: ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*
       - name: Find and generate bundle file
-        id: find-file
+        id: bundle
         run: |
-          current_date=$(date +'%Y%m%d')
-          echo "date: $(date)" > ./versions.txt
-          echo "variant: ${{ matrix.debug-level }}, ${{ matrix.variant }}" >> ./versions.txt
-          echo "openjdk: ${{ steps.extract-openjdk-revision.outputs.openjdk-revision }}" >> ./versions.txt
-          echo "mmtk-openjdk: ${{ steps.extract-mmtk-openjdk-revision.outputs.mmtk-openjdk-revision }}" >> ./versions.txt
-          bundle_name=$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)
-          bundle_file=jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}-$current_date.tar.gz
+          # Find output bundle
+          output_bundle_name=$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)
+          # Bundle names for uploading
+          bundle_file=jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}-${{ steps.revisions.outputs.date }}.tar.gz
           bundle_file_latest=jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}.tar.gz
-          mv $bundle_name ./archive.tar.gz
+          # Add versions.yml to the bundle
+          mv $output_bundle_name ./archive.tar.gz
           gunzip archive.tar.gz
-          tar rf archive.tar ./versions.txt
+          tar rf archive.tar ${{ steps.versions-yml.outputs.file }}
           gzip archive.tar
+          # Create bundles for uploading
           cp ./archive.tar.gz ./$bundle_file_latest
           mv ./archive.tar.gz ./$bundle_file
-          echo "::set-output name=bundle-file::$bundle_file_latest"
-          echo "::set-output name=bundle-file-latest::$bundle_file"
-      - name: Upload bundle ${{ steps.find-file.outputs.bundle-file }}
+          # Set output variables
+          echo "::set-output name=file::$bundle_file_latest"
+          echo "::set-output name=file-latest::$bundle_file"
+      - name: Upload bundle
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ${{ steps.find-file.outputs.bundle-file }}
+          file: ${{ steps.bundle.outputs.file }}
           release_id: 77066034
           overwrite: true
-      - name: Upload bundle ${{ steps.find-file.outputs.bundle-file-latest }}
+      - name: Update latest bundle
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ${{ steps.find-file.outputs.bundle-file-latest }}
+          file: ${{ steps.bundle.outputs.file-latest }}
           release_id: 77066034
           overwrite: true
