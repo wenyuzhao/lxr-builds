@@ -74,7 +74,7 @@ jobs:
       - name: Build OpenJDK
         run: |
           make CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
-          cp ${{ steps.versions-yml.outputs.file }} ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
+          cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
         working-directory: ./openjdk
       - name: Upload as artifact
         uses: actions/upload-artifact@v3
