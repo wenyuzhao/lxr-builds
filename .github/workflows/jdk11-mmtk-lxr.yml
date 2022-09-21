@@ -56,7 +56,7 @@ jobs:
           echo "variant: ${{ matrix.debug-level }}, ${{ matrix.variant }}" >> ./versions.yml
           echo "openjdk: ${{ steps.revisions.outputs.openjdk-revision }}" >> ./versions.yml
           echo "mmtk-openjdk: ${{ steps.revisions.outputs.mmtk-openjdk-revision }}" >> ./versions.yml
-          echo "::set-output name=file::./versions.yml"
+          echo "::set-output name=file::$(realpath ./versions.yml)"
       - name: Checkout JDK MMTk fork
         uses: actions/checkout@v3
         with:
