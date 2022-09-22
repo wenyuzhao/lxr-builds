@@ -92,7 +92,7 @@ jobs:
           # Add versions.yml to the bundle
           mv $output_bundle_name ./archive.tar.gz
           gunzip archive.tar.gz
-          tar rf archive.tar ${{ steps.versions-yml.outputs.file }}
+          tar rf archive.tar ./versions.yml
           gzip archive.tar
           # Create bundles for uploading
           cp ./archive.tar.gz ./$bundle_file_latest
