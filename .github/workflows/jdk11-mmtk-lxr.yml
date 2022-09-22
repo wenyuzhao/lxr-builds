@@ -108,6 +108,7 @@ jobs:
           file: ${{ steps.bundle.outputs.file }}
           release_id: 77066034
           overwrite: true
+          draft: false
       - name: Update latest bundle
         uses: xresloader/upload-to-github-release@v1
         env:
@@ -116,3 +117,4 @@ jobs:
           file: ${{ steps.bundle.outputs.file-latest }}
           release_id: 77066034
           overwrite: true
+          draft: false
