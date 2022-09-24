@@ -81,7 +81,7 @@ jobs:
         with:
           name: jdk11-mmtk-lxr-${{ matrix.debug-level }}-bundles
           path: ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*
-      - name: Find and generate bundle file
+      - name: Generate bundle file
         id: bundle
         run: |
           # Find output bundle
@@ -91,16 +91,21 @@ jobs:
           bundle_file_latest=jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}.tar.gz
           # Add versions.yml to the bundle
           mv $output_bundle_name ./archive.tar.gz
-          gunzip archive.tar.gz
-          tar rf archive.tar ./versions.yml
-          gzip archive.tar
+          tar xf ./archive.tar.gz -C archive
+          jdk_directory_path=$(realpath ./archive/jdk-*)
+          jdk_directory_name=$(basename $jdk_directory_path)
+          cp ./versions.yml $jdk_directory_name/versions.yml
+          rm ./archive.tar.gz
+          pushd ./archive &&
+          tar czf ../archive.tar.gz $jdk_directory_name
+          popd
           # Create bundles for uploading
           cp ./archive.tar.gz ./$bundle_file_latest
           mv ./archive.tar.gz ./$bundle_file
           # Set output variables
           echo "::set-output name=file::$bundle_file_latest"
           echo "::set-output name=file-latest::$bundle_file"
-      - name: Upload bundle
+      - name: Upload nightly bundle
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -115,6 +120,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: ${{ steps.bundle.outputs.file-latest }}
-          release_id: 77066034
+          release_id: 78037649
           overwrite: true
           draft: false
