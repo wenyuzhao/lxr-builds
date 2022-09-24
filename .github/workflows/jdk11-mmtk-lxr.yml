@@ -96,7 +96,7 @@ jobs:
           tar xf ./archive.tar.gz -C ./archive
           jdk_directory_path=$(realpath ./archive/jdk-*)
           jdk_directory_name=$(basename $jdk_directory_path)
-          cp ./versions.yml $jdk_directory_name/versions.yml
+          cp ./versions.yml $jdk_directory_path/versions.yml
           rm ./archive.tar.gz
           pushd ./archive &&
           tar czf ../archive.tar.gz $jdk_directory_name
