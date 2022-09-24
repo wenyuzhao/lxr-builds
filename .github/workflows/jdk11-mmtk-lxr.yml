@@ -69,7 +69,7 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Configure OpenJDK
-        run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }}
+        run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }} --with-target-bits=64 --with-native-debug-symbols=zipped --with-jvm-features=shenandoahgc
         working-directory: ./openjdk
       - name: Build OpenJDK
         run: |
@@ -87,11 +87,13 @@ jobs:
           # Find output bundle
           output_bundle_name=$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)
           # Bundle names for uploading
-          bundle_file=jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}-${{ steps.revisions.outputs.date }}.tar.gz
-          bundle_file_latest=jdk11-linux-x86_64-normal-server-${{ matrix.debug-level }}-${{ matrix.variant }}.tar.gz
+          common_name=jdk11-linux-x86_64-normal-server-${{ matrix.variant }}-${{ matrix.debug-level }}
+          bundle_file=$common_name-${{ steps.revisions.outputs.date }}.tar.gz
+          bundle_file_latest=$common_name.tar.gz
           # Add versions.yml to the bundle
           mv $output_bundle_name ./archive.tar.gz
-          tar xf ./archive.tar.gz -C archive
+          mkdir ./archive
+          tar xf ./archive.tar.gz -C ./archive
           jdk_directory_path=$(realpath ./archive/jdk-*)
           jdk_directory_name=$(basename $jdk_directory_path)
           cp ./versions.yml $jdk_directory_name/versions.yml
