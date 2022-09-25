@@ -1,7 +1,9 @@
-name: MMTk OpenJDK 11 (with LXR)
+name: jdk11-mmtk-lxr
 
 on:
-  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # daily at 00:00
 
 jobs:
   build:
