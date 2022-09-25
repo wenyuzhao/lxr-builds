@@ -1,0 +1,5 @@
+username: wenyuzhao
+safe: false
+highlighter: rouge
+plugins:
+  - jekyll-sitemap
