@@ -7,8 +7,8 @@ jobs:
   build:
     strategy:
       matrix:
-        debug-level: ["slowdebug"]
         variant: ["mmtk-lxr"]
+        debug-level: ["slowdebug", "fastdebug", "release"]
     name: jdk11-mmtk-lxr-${{ matrix.debug-level }}
     runs-on: ubuntu-latest
     steps:
