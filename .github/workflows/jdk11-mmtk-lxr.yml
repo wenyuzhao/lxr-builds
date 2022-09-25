@@ -30,7 +30,8 @@ jobs:
       - name: Checkout MMTk/OpenJDK binding
         uses: actions/checkout@v3
         with:
-          repository: mmtk/mmtk-openjdk
+          repository: wenyuzhao/mmtk-openjdk
+          ref: lxr
           path: ./mmtk-openjdk
       - name: Extract date and revisions
         id: revisions
