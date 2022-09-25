@@ -14,7 +14,7 @@
 
 ### GitHub Workflow Status
 
-[![jdk11-lxr-status](https://img.shields.io/github/workflow/status/wenyuzhao/lxr-builds/jdk11-mmtk-lxr?label=(workflow)%20jdk11-mmtk-lxr&logo=github&style=for-the-badge)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/jdk11-mmtk-lxr.yml)
+[![jdk11-lxr-status](https://img.shields.io/github/workflow/status/wenyuzhao/lxr-builds/jdk11-mmtk-lxr?label=jdk11-mmtk-lxr&logo=github&style=for-the-badge)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/jdk11-mmtk-lxr.yml)
 
 ### Source Code
 
