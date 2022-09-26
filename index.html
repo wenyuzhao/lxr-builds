@@ -1,0 +1,74 @@
+---
+date: 2020-01-03
+---
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LXR Nightly Builds</title>
+</head>
+
+<body>
+    <div style="display: none" id="raw-data">{{ site.github | jsonify }}</div>
+    <script>console.log('site.github', JSON.parse(document.getElementById("raw-data").innerHTML));</script>
+
+    <!-- Render the table -->
+    <table>
+        <tbody>
+
+            {% for build in builds %}
+                <tr>
+                    <td>{{ build.date }}</td>
+                    <td>{{ build.debug_level }}</td>
+                    <td><a href="{{ build.name }}">{{ build.name }}</a></td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+    <h1>All Nightly Builds</h1>
+
+    <!-- Create a list of builds, sorted by (debug-level, dates) in descending order. -->
+    {% assign builds = "" | split: ',' %}
+    {% assign releases = site.github.releases | where: "name", "nightly" %}
+    {% for release in releases %}
+        {% for raw in release.assets %}
+            {% assign _date = raw.name | split: "-" | get: -1 | split: "." | get: 0 | strptime: "%Y%m%d" | strftime: "%Y-%m-%d" %}
+            {% assign _item = raw | set: "date", _date %}
+            {% assign _debug_level = raw.name | split: "-" | get: -2 %}
+            {% assign _item = _item | set: "debug_level", _debug_level %}
+            {% case _debug_level %}
+                {% when "release" %}
+                    {% assign _item = _item | set: "_debug_level_rank", 2 %}
+                {% when "fastdebug" %}
+                    {% assign _item = _item | set: "_debug_level_rank", 1 %}
+                {% else %}
+                    {% assign _item = _item | set: "_debug_level_rank", 0 %}
+            {% endcase %}
+            {% assign builds = builds | push: _item %}
+        {% endfor %}
+    {% endfor %}
+    {% assign builds = builds | sort: "_debug_level_rank" | sort: "date" | reverse %}
+
+    <!-- Render the table -->
+    <table>
+        <tbody>
+
+            {% for build in builds %}
+                <tr>
+                    <td>{{ build.date }}</td>
+                    <td>{{ build.debug_level }}</td>
+                    <td><a href="{{ build.name }}">{{ build.name }}</a></td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</body>
+
+</html>
