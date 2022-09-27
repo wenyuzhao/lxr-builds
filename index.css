@@ -1,0 +1,86 @@
+:root {
+    --background-color: #fffcfc;
+    --background-color-active: #eeeeee;
+    --footer-color: #aaaaaa;
+    --text-color: #343434;
+    --line-color: #e1e1e1;
+    --transition: all 0.5s;
+}
+
+body {
+    font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-weight: 300;
+    font-size: 1.3em;
+    padding: 1em;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 300;
+    letter-spacing: -.1rem;
+    margin-bottom: 1rem;
+    margin-top: 3rem;
+}
+
+p a img {
+    vertical-align: middle;
+    vertical-align: sub;
+}
+
+table {
+    border-spacing: 0;
+    display: block;
+    overflow-x: auto;
+    text-align: left;
+    width: 100%;
+    white-space: nowrap;
+    margin-bottom: 2rem;
+}
+
+td:first-child, th:first-child {
+    padding-left: 4px;
+}
+
+td:last-child, th:last-child {
+    padding-right: 4px;
+}
+
+tr {
+    transition: var(--transition);
+}
+
+tr:hover {
+    background-color: var(--line-color);
+}
+
+td, th {
+    border-bottom: 0.1rem solid var(--line-color);
+    padding: 0.5rem 1rem;
+}
+
+th {
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: bold;
+    text-align: -internal-center;
+}
+
+td {
+    color: #505c66;
+}
+
+td a {
+    font-size: 0.9em;
+}
+
+
+footer {
+    margin: 5rem 0 5rem 0;
+    color: var(--footer-color);
+}
+
+footer a {
+    color: var(--footer-color);
+}

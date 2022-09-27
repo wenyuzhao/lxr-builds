@@ -4,7 +4,6 @@ module Jekyll
             input[key]
         end
         def set(input, key, value = "".freeze)
-            puts "set: #{key} = #{value}"
             input2 = input.dup
             input2[key] = value
             input2
