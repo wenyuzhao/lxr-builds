@@ -30,7 +30,6 @@
     {% endfor %}
 {% endfor %}
 {% assign builds = builds | sort: "_debug_level_rank" | sort: "date" | reverse %}
-{% assign latest_date = builds | get: 0 | get: "date" %}
 
 <!-- Create a list of latest builds, sorted by debug-level in descending order. -->
 
@@ -43,7 +42,8 @@
         {% assign _jdk = raw.name | split: "-" | get: 0 | slice: 3, 5 %}
         {% assign _item = _item | set: "jdk", _jdk %}
         {% comment %} Get build date {% endcomment %}
-        {% assign _item = _item | set: "date", latest_date %}
+        {% assign _date = _item.created_at | slice: 0, 10 %}
+        {% assign _item = _item | set: "date", _date %}
         {% comment %} Get debug level {% endcomment %}
         {% assign _debug_level = raw.name | split: "-" | get: -1 | split: "." | get: 0 %}
         {% assign _item = _item | set: "debug_level", _debug_level %}
