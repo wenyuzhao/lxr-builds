@@ -11,20 +11,30 @@ body {
     font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
     font-weight: 300;
     font-size: 1.3em;
-    padding: 1em;
+    margin: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     background-color: var(--background-color);
     color: var(--text-color);
     transition: var(--transition);
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 300;
-    letter-spacing: -.1rem;
-    margin-bottom: 1rem;
-    margin-top: 3rem;
+main h1:first-child {
+    margin-top: 1rem;
 }
 
-p a img {
+p {
+    margin-top: 1em;
+    margin-top: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    margin-top: 3.5rem;
+}
+
+main p a img {
     vertical-align: middle;
     vertical-align: sub;
 }
@@ -77,8 +87,9 @@ td a {
 
 
 footer {
-    margin: 5rem 0 5rem 0;
+    margin: 7rem 0 5rem 0;
     color: var(--footer-color);
+    font-style: italic;
 }
 
 footer a {
