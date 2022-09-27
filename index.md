@@ -22,7 +22,7 @@ layout: default
 | Date | JDK | Debug Level | File |
 | ---- | ---:| ----------- | ---- |
 {% for build in latest_builds -%}
-| {{ build.date }} | {{ build.jdk }} | {{ build.debug_level }} | [{{ build.name }}]({{ build.url }}) |
+| {{ build.date }} | {{ build.jdk }} | {{ build.debug_level }} | [{{ build.name }}]({{ build.browser_download_url }}) |
 {% endfor %}
 
 
@@ -31,5 +31,5 @@ layout: default
 | Date | JDK | Debug Level | File |
 | ---- | ---:| ----------- | ---- |
 {% for build in builds -%}
-| {{ build.date }} | {{ build.jdk }} | {{ build.debug_level }} | [{{ build.name }}]({{ build.url }}) |
+| {{ build.date }} | {{ build.jdk }} | {{ build.debug_level }} | [{{ build.name }}]({{ build.browser_download_url }}) |
 {% endfor %}
