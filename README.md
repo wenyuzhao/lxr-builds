@@ -16,6 +16,8 @@
 
 [![jdk11-lxr-status](https://img.shields.io/github/workflow/status/wenyuzhao/lxr-builds/jdk11-mmtk-lxr?label=jdk11-mmtk-lxr&logo=github&style=for-the-badge)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/jdk11-mmtk-lxr.yml)
 
+[![pages-status](https://img.shields.io/github/workflow/status/wenyuzhao/lxr-builds/github-pages?label=github-pages&logo=github&style=for-the-badge)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/github-pages.yml)
+
 ### Source Code
 
 The builds are generated nightly from the latest commit of [wenyuzhao/mmtk-openjdk/tree/lxr](https://github.com/wenyuzhao/mmtk-openjdk/tree/lxr).
