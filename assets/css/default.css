@@ -20,9 +20,7 @@ body {
 }
 
 main h1:first-child {
-    margin-top: 10rem;
-    margin-bottom: 6rem;
-    text-align: center;
+    margin-top: 1rem;
 }
 
 p {
@@ -34,11 +32,6 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 300;
     margin-bottom: 1.5rem;
     margin-top: 3.5rem;
-}
-
-main, footer {
-    max-width: 25cm;
-    margin: auto;
 }
 
 main p a img {
@@ -94,10 +87,9 @@ td a {
 
 
 footer {
-    margin: 7rem auto 5rem auto;
+    margin: 7rem 0 5rem 0;
     color: var(--footer-color);
     font-style: italic;
-    text-align: center;
 }
 
 footer a {
