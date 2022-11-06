@@ -72,7 +72,7 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Configure OpenJDK
-        run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }} --with-target-bits=64 --with-native-debug-symbols=zipped --with-jvm-features=shenandoahgc
+        run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }} --with-target-bits=64 --with-jvm-features=shenandoahgc
         working-directory: ./openjdk
       - name: Build OpenJDK
         run: |
