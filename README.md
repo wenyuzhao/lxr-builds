@@ -18,8 +18,22 @@
 
 [![pages-status](https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/github-pages.yml?label=github-pages&logo=github&style=for-the-badge&branch=main)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/github-pages.yml)
 
+### How to run LXR
+
+```bash
+# Download latest LXR
+wget https://github.com/wenyuzhao/lxr-builds/releases/download/latest/jdk11-linux-x86_64-normal-server-mmtk-lxr-release.tar.gz
+tar xf ./jdk11-linux-x86_64-normal-server-mmtk-lxr-release.tar.gz
+
+# Run LXR
+./jdk-11.0.19/bin/java -XX:+UseThirdPartyHeap -XX:ThirdPartyHeapOptions=plan=LXR -Xms100M -Xmx100M  -version
+```
+
+Please always specify `-Xms` and `-Xmx` and make sure the values are the same. LXR does not support variable heap sizes right now.
+
 ### Source Code
 
 The builds are generated nightly from the latest commit of [wenyuzhao/mmtk-openjdk/tree/lxr](https://github.com/wenyuzhao/mmtk-openjdk/tree/lxr).
 
 The [`Cargo.toml`](https://github.com/wenyuzhao/mmtk-openjdk/blob/lxr/mmtk/Cargo.toml) file should specify the git revision of mmtk-core and openjdk.
+
