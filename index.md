@@ -14,6 +14,18 @@ layout: default
 
 <span style="line-height: 2em">***Paper:*** [![doi](https://img.shields.io/badge/DOI-10.1145/3519939.3523440-green.svg?style=for-the-badge)](https://dl.acm.org/doi/pdf/10.1145/3519939.3523440)</span>
 
+# How to run LXR
+
+```bash
+# Download latest LXR
+wget https://github.com/wenyuzhao/lxr-builds/releases/download/latest/jdk11-linux-x86_64-normal-server-mmtk-lxr-release.tar.gz
+tar xf ./jdk11-linux-x86_64-normal-server-mmtk-lxr-release.tar.gz
+
+# Run LXR
+./jdk-11.0.19/bin/java -XX:+UseThirdPartyHeap -XX:ThirdPartyHeapOptions=plan=LXR -Xms100M -Xmx100M  -version
+```
+
+Please always specify both -Xms and -Xmx, and ensure that their values are identical. Currently, LXR does not support variable heap size.
 
 {% include load-builds.html %}
 
