@@ -29,7 +29,7 @@ tar xf ./jdk11-linux-x86_64-normal-server-mmtk-lxr-release.tar.gz
 ./jdk-11.0.19/bin/java -XX:+UseThirdPartyHeap -XX:ThirdPartyHeapOptions=plan=LXR -Xms100M -Xmx100M  -version
 ```
 
-Please always specify `-Xms` and `-Xmx` and make sure the values are the same. LXR does not support variable heap sizes right now.
+Please always specify both -Xms and -Xmx, and ensure that their values are identical. Currently, LXR does not support variable heap size.
 
 ### Source Code
 
