@@ -1,8 +1,0 @@
-title: LXR Nightly Builds
-repository: wenyuzhao/lxr-builds
-username: wenyuzhao
-safe: false
-highlighter: rouge
-plugins:
-  - jekyll-sitemap
-  - jekyll-github-metadata
