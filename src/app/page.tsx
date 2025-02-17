@@ -57,9 +57,6 @@ export default async function Home() {
               <a href="https://github.com/wenyuzhao/lxr-builds/actions/workflows/jdk11-mmtk-lxr.yml">
                 <img src="https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/jdk11-mmtk-lxr.yml?label=jdk11-mmtk-lxr&amp;logo=github&amp;style=for-the-badge&amp;branch=main" alt="jdk11-lxr-status" />
               </a>
-              <a href="https://github.com/wenyuzhao/lxr-builds/actions/workflows/github-pages.yml">
-                <img src="https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/github-pages.yml?label=github-pages&amp;logo=github&amp;style=for-the-badge&amp;branch=main" alt="pages-status" />
-              </a>
             </p>
             <p>
               <label>Source Code:</label>

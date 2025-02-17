@@ -16,8 +16,6 @@
 
 [![jdk11-lxr-status](https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/jdk11-mmtk-lxr.yml?label=jdk11-mmtk-lxr&logo=github&style=for-the-badge&branch=main)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/jdk11-mmtk-lxr.yml)
 
-[![pages-status](https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/github-pages.yml?label=github-pages&logo=github&style=for-the-badge&branch=main)](https://github.com/wenyuzhao/lxr-builds/actions/workflows/github-pages.yml)
-
 ### How to run LXR
 
 ```bash
