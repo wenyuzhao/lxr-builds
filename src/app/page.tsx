@@ -1,6 +1,12 @@
-import Image from "next/image";
+'use server'
 
-export default function Home() {
+import Image from "next/image";
+import { listArtifacts } from "./actions";
+
+
+export default async function Home() {
+  const artifacts = await listArtifacts();
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -47,6 +53,14 @@ export default function Home() {
           >
             Read our docs
           </a>
+        </div>
+        <div className="flex flex-col gap-4 items-center">
+          <h2 className="text-lg font-semibold">Files in the bucket:</h2>
+          <ul className="text-sm text-center sm:text-left">
+            {artifacts.all.map((artifact) => (
+              <li key={artifact.file}>{artifact.file}</li>
+            ))}
+          </ul>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
