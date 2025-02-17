@@ -78,7 +78,7 @@ jobs:
           cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
         working-directory: ./openjdk
       - name: Upload as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jdk11-mmtk-lxr-${{ matrix.debug-level }}-bundles
           path: ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*
