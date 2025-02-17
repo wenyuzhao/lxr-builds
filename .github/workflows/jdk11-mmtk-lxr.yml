@@ -7,6 +7,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: "read"
+      id-token: "write"
     strategy:
       matrix:
         variant: ["mmtk-lxr"]
@@ -14,21 +17,16 @@ jobs:
     name: jdk11-mmtk-lxr-${{ matrix.debug-level }}
     runs-on: ubuntu-latest
     steps:
+      - name: Google auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
       - name: Install build dependencies
         run: >
-          sudo apt-get update &&
-          sudo apt-get install -y
-          build-essential
-          libfreetype6-dev
-          libcups2-dev
-          libx11-dev libxext-dev libxrender-dev libxrandr-dev libxtst-dev libxt-dev
-          libasound2-dev
-          libffi-dev
-          autoconf
-          zip
-          unzip
-          libfontconfig1-dev
-          pigz
+          sudo apt-get update && sudo apt-get install -y
+            build-essential libfreetype6-dev libcups2-dev
+            libx11-dev libxext-dev libxrender-dev libxrandr-dev libxtst-dev libxt-dev
+            libasound2-dev libffi-dev autoconf zip unzip libfontconfig1-dev pigz
       - name: Checkout MMTk/OpenJDK binding
         uses: actions/checkout@v3
         with:
@@ -110,21 +108,8 @@ jobs:
           # Set output variables
           echo "::set-output name=file::$bundle_file"
           echo "::set-output name=file-latest::$bundle_file_latest"
-      - name: Upload nightly bundle
+      - name: Upload to GCS
         uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ${{ steps.bundle.outputs.file }}
-          release_id: 77066034
-          overwrite: true
-          draft: false
-      - name: Update latest bundle
-        uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: ${{ steps.bundle.outputs.file-latest }}
-          release_id: 78037649
-          overwrite: true
-          draft: false
+          path: ${{ steps.bundle.outputs.file }}
+          destination: lxr-builds
