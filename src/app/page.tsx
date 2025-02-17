@@ -1,6 +1,5 @@
 'use server'
 
-import Image from "next/image";
 import { unstable_cache } from 'next/cache';
 import { listArtifacts, Artifacts, Artifact } from "./actions";
 
