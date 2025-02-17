@@ -3,19 +3,165 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background-color: #ffffff;
+  --text-color: #171717;
+  --table-hover-background-color: #e1e1e1;
+
+  --footer-color: #aaaaaa;
+  --link-color: #007bff;
+  --transition: all 0.5s;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background-color: #0a0a0a;
+    --text-color: #ededed;
+    --table-hover-background-color: #333333;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 400;
+  margin: 1em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+
+main h1:first-child {
+  margin-top: 1rem;
+}
+
+.badges p {
+  margin-top: 1em;
+  margin-top: 1em;
+  vertical-align: middle;
+  line-height: 2em;
+  font-size: 1.2rem;
+}
+
+.badges p label {
+  font-style: italic;
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+.badges p a {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.badges p img {
+  display: inline-block
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  margin-top: 3.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-top: 5rem !important;
+}
+
+header h1 {
+  margin-top: 1rem !important;
+}
+
+header p:not(:first-child) a {
+  margin-left: 0.3rem;
+}
+
+header p a img {
+  vertical-align: middle;
+  vertical-align: sub;
+}
+
+table {
+  border-spacing: 0;
+  display: block;
+  overflow-x: auto;
+  text-align: left;
+  width: 100%;
+  white-space: nowrap;
+  margin-bottom: 2rem;
+}
+
+td:first-child,
+th:first-child {
+  padding-left: 4px;
+}
+
+td:last-child,
+th:last-child {
+  padding-right: 4px;
+}
+
+tr {
+  transition: var(--transition);
+}
+
+tr:hover {
+  background-color: var(--table-hover-background-color);
+}
+
+td,
+th {
+  border-bottom: 1px solid var(--table-hover-background-color);
+  padding: 0.2rem 1rem;
+  text-align: left;
+}
+
+th {
+  display: table-cell;
+  vertical-align: inherit;
+  font-weight: bold;
+}
+
+td:nth-child(2),
+th:nth-child(2) {
+  text-align: right;
+}
+
+td {
+  color: var(--text-color);
+}
+
+td a {
+  font-size: 0.9em;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: var(--link-color);
+}
+
+footer {
+  margin: 7rem 0 5rem 0;
+  color: var(--footer-color);
+  font-style: italic;
+}
+
+footer a {
+  color: var(--footer-color);
+  text-decoration: underline;
 }

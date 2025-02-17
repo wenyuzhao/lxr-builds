@@ -1,114 +1,97 @@
 'use server'
 
 import Image from "next/image";
-import { listArtifacts } from "./actions";
+import { unstable_cache } from 'next/cache';
+import { listArtifacts, Artifacts, Artifact } from "./actions";
 
+const getCachedArtifacts = unstable_cache(
+  listArtifacts,
+  undefined,
+  { revalidate: 3600 },
+);
+
+const ArtifactsTable = (props: { artifacts: Artifact[] }) => (
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>JDK</th>
+        <th>Debug Level</th>
+        <th>File</th>
+      </tr>
+    </thead>
+    <tbody>
+      {props.artifacts.map((artifact) => (
+        <tr key={artifact.file}>
+          <td>{artifact.date}</td>
+          <td>{artifact.jdk}</td>
+          <td>{artifact.profile}</td>
+          <td>
+            <a href={`https://storage.cloud.google.com/lxr-builds/${artifact.file}`}>{artifact.file}</a>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
 
 export default async function Home() {
-  const artifacts = await listArtifacts();
+  const artifacts: Artifacts = await getCachedArtifacts();
+
+  const latestArtifacts = [
+    artifacts.latest.release,
+    artifacts.latest.fastdebug,
+    artifacts.latest.slowdebug,
+  ].filter((artifact) => artifact !== undefined);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div>
+      <main>
+        <header>
+          <h1>LXR GC Nightly Builds</h1>
+          <div className="badges">
+            <p>
+              <a href="https://github.com/wenyuzhao/mmtk-openjdk/tree/lxr">MMTk-OpenJDK</a> nightly builds with <a href="https://dl.acm.org/doi/pdf/10.1145/3519939.3523440">LXR GC</a>.
+            </p>
+            <p>
+              <label>GitHub Workflow Status:</label>
+              <a href="https://github.com/wenyuzhao/lxr-builds/actions/workflows/jdk11-mmtk-lxr.yml">
+                <img src="https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/jdk11-mmtk-lxr.yml?label=jdk11-mmtk-lxr&amp;logo=github&amp;style=for-the-badge&amp;branch=main" alt="jdk11-lxr-status" />
+              </a>
+              <a href="https://github.com/wenyuzhao/lxr-builds/actions/workflows/github-pages.yml">
+                <img src="https://img.shields.io/github/actions/workflow/status/wenyuzhao/lxr-builds/github-pages.yml?label=github-pages&amp;logo=github&amp;style=for-the-badge&amp;branch=main" alt="pages-status" />
+              </a>
+            </p>
+            <p>
+              <label>Source Code:</label>
+              <a href="https://github.com/wenyuzhao/mmtk-core/tree/lxr">
+                <img src="https://img.shields.io/github/stars/wenyuzhao/mmtk-core?label=mmtk-core%40lxr&amp;logo=github&amp;style=for-the-badge" alt="mmtk-core" />
+              </a>
+              <a href="https://github.com/wenyuzhao/mmtk-openjdk/tree/lxr">
+                <img src="https://img.shields.io/github/stars/wenyuzhao/mmtk-openjdk?label=mmtk-openjdk%40lxr&amp;logo=github&amp;style=for-the-badge" alt="mmtk-openjdk" />
+              </a>
+            </p>
+            <p>
+              <label>Paper:</label>
+              <a href="https://dl.acm.org/doi/pdf/10.1145/3519939.3523440">
+                <img src="https://img.shields.io/badge/DOI-10.1145/3519939.3523440-green.svg?style=for-the-badge" alt="doi" />
+              </a>
+            </p>
+          </div>
+        </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-        <div className="flex flex-col gap-4 items-center">
-          <h2 className="text-lg font-semibold">Files in the bucket:</h2>
-          <ul className="text-sm text-center sm:text-left">
-            {artifacts.all.map((artifact) => (
-              <li key={artifact.file}>{artifact.file}</li>
-            ))}
-          </ul>
-        </div>
+        <section>
+          <h1>Latest Builds</h1>
+          <ArtifactsTable artifacts={latestArtifacts} />
+        </section>
+
+        <section>
+          <h1>All Nightly Builds</h1>
+          <ArtifactsTable artifacts={artifacts.all} />
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      <footer>
+        © 2025 <a href="https://wenyu.me">Wenyu Zhao</a>, <a href="https://mmtk.io">The MMTk Project</a>.
       </footer>
     </div>
   );

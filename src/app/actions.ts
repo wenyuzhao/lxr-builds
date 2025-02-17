@@ -33,8 +33,9 @@ export async function listArtifacts(): Promise<Artifacts> {
     const artifacts: Artifact[] = files.map(name => {
         const stem = name.split(".")[0];
         const segments = stem.split("-");
-        const date = segments[segments.length - 1];
         const profile = segments[segments.length - 2];
+        let date = segments[segments.length - 1];
+        date = date.slice(0, 4) + "-" + date.slice(4, 6) + "-" + date.slice(6, 8);
         return {
             file: name,
             date,
@@ -56,7 +57,7 @@ export async function listArtifacts(): Promise<Artifacts> {
                 return 0;
             }
         } else {
-            return parseInt(b.date) - parseInt(a.date);
+            return parseInt(b.date.replaceAll("-", "")) - parseInt(a.date.replaceAll("-", ""));
         }
     });
     const latest_release_build = sorted_by_date_and_profile.find(artifact => artifact.profile === "release");
