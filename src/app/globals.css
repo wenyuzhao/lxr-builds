@@ -162,6 +162,6 @@ footer {
 }
 
 footer a {
-  color: var(--footer-color);
+  color: var(--link-color);
   text-decoration: underline;
 }
