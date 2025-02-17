@@ -3,7 +3,13 @@
 import { Storage } from "@google-cloud/storage";
 
 const BUCKET_NAME = "lxr-builds";
-const STORAGE = new Storage();
+
+const credentials = JSON.parse(
+    Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS as string, 'base64').toString()
+);
+const STORAGE = new Storage({
+    credentials,
+});
 
 // FILE NAME FORMAT: jdk11-linux-x86_64-normal-server-mmtk-lxr-release-20220925
 // EXTENSION: .tar.gz
