@@ -23,9 +23,9 @@ jobs:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
       - name: Install build dependencies
         run: >
-          sudo apt-get update && sudo apt-get install -y
-            build-essential libfreetype6-dev libcups2-dev
-            libx11-dev libxext-dev libxrender-dev libxrandr-dev libxtst-dev libxt-dev
+          sudo apt-get update && sudo apt-get install -y \
+            build-essential libfreetype6-dev libcups2-dev \
+            libx11-dev libxext-dev libxrender-dev libxrandr-dev libxtst-dev libxt-dev \
             libasound2-dev libffi-dev autoconf zip unzip libfontconfig1-dev pigz
       - name: Checkout MMTk/OpenJDK binding
         uses: actions/checkout@v3
