@@ -90,7 +90,6 @@ jobs:
           # Bundle names for uploading
           common_name=jdk11-linux-x86_64-normal-server-${{ matrix.variant }}-${{ matrix.debug-level }}
           bundle_file=$common_name-${{ steps.revisions.outputs.date }}.tar.gz
-          bundle_file_latest=$common_name.tar.gz
           # Add versions.yml to the bundle
           mv $output_bundle_name ./archive.tar.gz
           mkdir ./archive
@@ -103,13 +102,11 @@ jobs:
           tar czf ../archive.tar.gz $jdk_directory_name
           popd
           # Create bundles for uploading
-          cp ./archive.tar.gz ./$bundle_file
-          mv ./archive.tar.gz ./$bundle_file_latest
+          mv ./archive.tar.gz ./$bundle_file
           # Set output variables
-          echo "::set-output name=file::$bundle_file"
-          echo "::set-output name=file-latest::$bundle_file_latest"
+          echo "BUNDLE_FILE=$bundle_file" >> $GITHUB_ENV
       - name: Upload to GCS
         uses: xresloader/upload-to-github-release@v1
         with:
-          path: ${{ steps.bundle.outputs.file }}
+          path: $BUNDLE_FILE
           destination: lxr-builds
