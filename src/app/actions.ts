@@ -48,7 +48,7 @@ export async function listArtifacts(): Promise<Artifacts> {
             profile: profile as JDKBuildProfile,
             jdk: segments[0].slice(3),
         }
-    });
+    }).filter(a => a.profile === "release");
     const sorted_by_date_and_profile = artifacts.sort((a, b) => {
         if (a.date === b.date) {
             if (a.profile === "release") {
