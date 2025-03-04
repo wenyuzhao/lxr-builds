@@ -64,11 +64,6 @@ jobs:
           repository: mmtk/openjdk
           path: ./openjdk
           ref: ${{ steps.revisions.outputs.openjdk-revision }}
-      # - name: Install latest stable Rust toolchain
-      # uses: actions-rs/toolchain@v1
-      # with:
-      #   profile: minimal
-      #   toolchain: stable
       - name: Configure OpenJDK
         run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }} --with-target-bits=64 --with-jvm-features=shenandoahgc
         working-directory: ./openjdk
