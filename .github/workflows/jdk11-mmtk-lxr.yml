@@ -14,6 +14,7 @@ jobs:
       matrix:
         variant: ["mmtk-lxr"]
         debug-level: ["release"]
+        pgo: [true, false]
     name: jdk11-mmtk-lxr-${{ matrix.debug-level }}
     runs-on: ubuntu-latest
     steps:
@@ -57,6 +58,7 @@ jobs:
           echo "variant: ${{ matrix.debug-level }}, ${{ matrix.variant }}" >> ./versions.yml
           echo "openjdk: ${{ steps.revisions.outputs.openjdk-revision }}" >> ./versions.yml
           echo "mmtk-openjdk: ${{ steps.revisions.outputs.mmtk-openjdk-revision }}" >> ./versions.yml
+          echo "pgo: ${{ matrix.pgo }}" >> ./versions.yml
           echo "::set-output name=file::$(realpath ./versions.yml)"
       - name: Checkout JDK MMTk fork
         uses: actions/checkout@v3
@@ -68,8 +70,27 @@ jobs:
         run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }} --with-target-bits=64 --with-jvm-features=shenandoahgc
         working-directory: ./openjdk
       - name: Build OpenJDK
+        if: ${{ !matrix.pgo }}
         run: |
           make CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
+          cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
+        working-directory: ./openjdk
+      - name: Build OpenJDK for PGO profile generation
+        if: ${{ matrix.pgo }}
+        run: |
+          cd ../mmtk-openjdk/mmtk && rustup component add llvm-tools-preview
+          rm -rf /tmp/pgo-data
+          make RUSTFLAGS=-Cprofile-generate=/tmp/pgo-data CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
+        working-directory: ./openjdk
+      - name: Generate PGO profile
+        if: ${{ matrix.pgo }}
+        run: |
+          RUST_BACKTRACE=1 MMTK_PLAN=LXR ./openjdk/build/linux-x86_64-normal-server-release/images/jdk/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+ExitOnOutOfMemoryError --add-exports java.base/jdk.internal.ref=ALL-UNNAMED -XX:+UseThirdPartyHeap -Xms20M -Xmx20M -jar ./gcbench/gcbench.jar
+      - name: Build OpenJDK with PGO
+        if: ${{ matrix.pgo }}
+        run: |
+          cd ../mmtk-openjdk/mmtk && ~.cargo/bin/rust-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
+          make RUSTFLAGS=-Cprofile-use=/tmp/pgo-data/merged.profdata CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
           cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
         working-directory: ./openjdk
       - name: Upload as artifact
@@ -84,6 +105,9 @@ jobs:
           output_bundle_name=$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)
           # Bundle names for uploading
           common_name=jdk11-linux-x86_64-normal-server-${{ matrix.variant }}-${{ matrix.debug-level }}
+          if [[ "${{ matrix.pgo }}" == "true" ]]; then
+            common_name=$common_name-pgo
+          fi
           bundle_file=$common_name-${{ steps.revisions.outputs.date }}.tar.gz
           # Add versions.yml to the bundle
           mv $output_bundle_name ./archive.tar.gz
@@ -100,8 +124,8 @@ jobs:
           mv ./archive.tar.gz ./$bundle_file
           # Set output variables
           echo "::set-output name=file::$bundle_file"
-      - name: Upload to GCS
-        uses: google-github-actions/upload-cloud-storage@v2
-        with:
-          path: ${{ steps.bundle.outputs.file }}
-          destination: lxr-builds
+      # - name: Upload to GCS
+      #   uses: google-github-actions/upload-cloud-storage@v2
+      #   with:
+      #     path: ${{ steps.bundle.outputs.file }}
+      #     destination: lxr-builds
