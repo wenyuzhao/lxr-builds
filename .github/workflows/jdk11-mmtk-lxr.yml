@@ -15,7 +15,7 @@ jobs:
         variant: ["mmtk-lxr"]
         debug-level: ["release"]
         pgo: [true, false]
-    name: jdk11-mmtk-lxr-${{ matrix.debug-level }}${{ matrix.pgo == 'true' && '-pgo' || '' }}
+    name: jdk11-mmtk-lxr-${{ matrix.debug-level }}${{ matrix.pgo == true && '-pgo' || '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Google auth
@@ -70,13 +70,13 @@ jobs:
         run: sh configure --disable-warnings-as-errors --with-debug-level=${{ matrix.debug-level }} --with-target-bits=64 --with-jvm-features=shenandoahgc
         working-directory: ./openjdk
       - name: Build OpenJDK
-        if: ${{ matrix.pgo }}
+        if: ${{ matrix.pgo == false }}
         run: |
           make CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
           cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
         working-directory: ./openjdk
       - name: Build OpenJDK for PGO profile generation
-        if: ${{ matrix.pgo }}
+        if: ${{ matrix.pgo == true }}
         run: |
           pushd ../mmtk-openjdk/mmtk
             rustup component add llvm-tools-preview
