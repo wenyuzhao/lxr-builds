@@ -82,24 +82,27 @@ jobs:
             rustup component add llvm-tools-preview
           popd
           rm -rf /tmp/pgo-data
-          ls
           make RUSTFLAGS=-Cprofile-generate=/tmp/pgo-data CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
         working-directory: ./openjdk
       - name: Generate PGO profile
-        if: ${{ matrix.pgo }}
+        if: ${{ matrix.pgo == true }}
         run: |
+          echo $PWD
+          ls
           RUST_BACKTRACE=1 MMTK_PLAN=LXR ./openjdk/build/linux-x86_64-normal-server-release/images/jdk/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+ExitOnOutOfMemoryError --add-exports java.base/jdk.internal.ref=ALL-UNNAMED -XX:+UseThirdPartyHeap -Xms20M -Xmx20M -jar ./gcbench/gcbench.jar
       - name: Build OpenJDK with PGO
-        if: ${{ matrix.pgo }}
+        if: ${{ matrix.pgo == true }}
         run: |
-          cd ../mmtk-openjdk/mmtk && ~.cargo/bin/rust-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
+          pushd ../mmtk-openjdk/mmtk
+            ~.cargo/bin/rust-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
+          popd
           make RUSTFLAGS=-Cprofile-use=/tmp/pgo-data/merged.profdata CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
           cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
         working-directory: ./openjdk
       - name: Upload as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jdk11-mmtk-lxr-${{ matrix.debug-level }}-bundles
+          name: jdk11-mmtk-lxr-${{ matrix.debug-level }}${{ matrix.pgo == true && '-pgo' || '' }}-bundles
           path: ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*
       - name: Generate bundle file
         id: bundle
@@ -107,10 +110,7 @@ jobs:
           # Find output bundle
           output_bundle_name=$(ls ./openjdk/build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/*.tar.gz | grep -v -e symbols -e demos)
           # Bundle names for uploading
-          common_name=jdk11-linux-x86_64-normal-server-${{ matrix.variant }}-${{ matrix.debug-level }}
-          if [[ "${{ matrix.pgo }}" == "true" ]]; then
-            common_name=$common_name-pgo
-          fi
+          common_name=jdk11-linux-x86_64-normal-server-${{ matrix.variant }}-${{ matrix.debug-level }}${{ matrix.pgo == true && '-pgo' || '' }}
           bundle_file=$common_name-${{ steps.revisions.outputs.date }}.tar.gz
           # Add versions.yml to the bundle
           mv $output_bundle_name ./archive.tar.gz
