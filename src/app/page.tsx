@@ -16,6 +16,7 @@ const ArtifactsTable = (props: { artifacts: Artifact[] }) => (
         <th>Date</th>
         <th>JDK</th>
         <th>Debug Level</th>
+        <th><a href="https://en.wikipedia.org/wiki/Profile-guided_optimization">PGO</a></th>
         <th>File</th>
       </tr>
     </thead>
@@ -25,6 +26,7 @@ const ArtifactsTable = (props: { artifacts: Artifact[] }) => (
           <td>{artifact.date}</td>
           <td>{artifact.jdk}</td>
           <td>{artifact.profile}</td>
+          <td className={artifact.pgo ? "text-green-400" : "text-orange-400"}>{artifact.pgo ? "✔" : "✘"}</td>
           <td>
             <a href={`https://storage.cloud.google.com/lxr-builds/${artifact.file}`}>{artifact.file}</a>
           </td>
