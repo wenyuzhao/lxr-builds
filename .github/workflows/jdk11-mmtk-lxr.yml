@@ -18,6 +18,8 @@ jobs:
     name: jdk11-mmtk-lxr-${{ matrix.debug-level }}${{ matrix.pgo == true && '-pgo' || '' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Google auth
         uses: google-github-actions/auth@v2
         with:
@@ -88,7 +90,10 @@ jobs:
         if: ${{ matrix.pgo == true }}
         run: |
           echo $PWD
+          echo "---"
           ls
+          echo "---"
+          ls ..
           RUST_BACKTRACE=1 MMTK_PLAN=LXR ./openjdk/build/linux-x86_64-normal-server-release/images/jdk/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+ExitOnOutOfMemoryError --add-exports java.base/jdk.internal.ref=ALL-UNNAMED -XX:+UseThirdPartyHeap -Xms20M -Xmx20M -jar ./gcbench/gcbench.jar
       - name: Build OpenJDK with PGO
         if: ${{ matrix.pgo == true }}
