@@ -129,8 +129,8 @@ jobs:
           mv ./archive.tar.gz ./$bundle_file
           # Set output variables
           echo "::set-output name=file::$bundle_file"
-      # - name: Upload to GCS
-      #   uses: google-github-actions/upload-cloud-storage@v2
-      #   with:
-      #     path: ${{ steps.bundle.outputs.file }}
-      #     destination: lxr-builds
+      - name: Upload to GCS
+        uses: google-github-actions/upload-cloud-storage@v2
+        with:
+          path: ${{ steps.bundle.outputs.file }}
+          destination: lxr-builds
