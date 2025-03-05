@@ -99,7 +99,7 @@ jobs:
         if: ${{ matrix.pgo == true }}
         run: |
           pushd ../mmtk-openjdk/mmtk
-            ~.cargo/bin/rust-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
+            ~/.cargo/bin/rust-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
           popd
           make RUSTFLAGS=-Cprofile-use=/tmp/pgo-data/merged.profdata CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
           cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
