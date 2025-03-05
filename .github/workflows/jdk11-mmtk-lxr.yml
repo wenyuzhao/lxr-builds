@@ -90,17 +90,13 @@ jobs:
       - name: Generate PGO profile
         if: ${{ matrix.pgo == true }}
         run: |
-          echo $PWD
-          echo "---"
-          ls
-          echo "---"
-          ls ..
           RUST_BACKTRACE=1 MMTK_PLAN=LXR ./openjdk/build/linux-x86_64-normal-server-release/images/jdk/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+ExitOnOutOfMemoryError --add-exports java.base/jdk.internal.ref=ALL-UNNAMED -XX:+UseThirdPartyHeap -Xms20M -Xmx20M -jar ./gcbench/gcbench.jar
       - name: Build OpenJDK with PGO
         if: ${{ matrix.pgo == true }}
         run: |
           pushd ../mmtk-openjdk/mmtk
             ~/.cargo/bin/rust-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
+            rm -rf ./target/x86_64-unknown-linux-gnu/release/build/pfm-sys-* # Remove pfm-sys-* to avoid build error
           popd
           make RUSTFLAGS=-Cprofile-use=/tmp/pgo-data/merged.profdata CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
           cp ${{ steps.versions-yml.outputs.file }} ./build/linux-x86_64-normal-server-${{ matrix.debug-level }}/bundles/versions.yml
