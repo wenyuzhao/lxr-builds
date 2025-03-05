@@ -81,7 +81,8 @@ jobs:
         if: ${{ matrix.pgo == true }}
         run: |
           pushd ../mmtk-openjdk/mmtk
-            rustup component add llvm-tools-preview
+            cargo install cargo-binutils
+            rustup component add llvm-tools
           popd
           rm -rf /tmp/pgo-data
           make RUSTFLAGS=-Cprofile-generate=/tmp/pgo-data CONF=linux-x86_64-normal-server-${{ matrix.debug-level }} THIRD_PARTY_HEAP=$PWD/../mmtk-openjdk/openjdk product-bundles
