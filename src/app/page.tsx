@@ -40,9 +40,8 @@ export default async function Home() {
   const artifacts: Artifacts = await getCachedArtifacts();
 
   const latestArtifacts = [
+    artifacts.latest.release_pgo,
     artifacts.latest.release,
-    artifacts.latest.fastdebug,
-    artifacts.latest.slowdebug,
   ].filter((artifact) => artifact !== undefined);
 
   return (

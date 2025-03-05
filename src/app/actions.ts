@@ -28,8 +28,7 @@ export type Artifacts = {
     all: Artifact[];
     latest: {
         release: Artifact | undefined;
-        fastdebug: Artifact | undefined;
-        slowdebug: Artifact | undefined;
+        release_pgo: Artifact | undefined;
     }
 };
 
@@ -85,15 +84,14 @@ export async function listArtifacts(): Promise<Artifacts> {
         }
         return 0;
     });
-    const latest_release_build = sorted_artifacts.find(artifact => artifact.profile === "release");
-    const latest_fastdebug_build = sorted_artifacts.find(artifact => artifact.profile === "fastdebug");
-    const latest_slowdebug_build = sorted_artifacts.find(artifact => artifact.profile === "slowdebug");
+    const latest_release_build = sorted_artifacts.find(artifact => artifact.profile === "release" && !artifact.pgo);
+    const latest_release_pgo_build = sorted_artifacts.find(artifact => artifact.profile === "release" && artifact.pgo);
+
     return {
         all: sorted_artifacts,
         latest: {
             release: latest_release_build,
-            fastdebug: latest_fastdebug_build,
-            slowdebug: latest_slowdebug_build,
+            release_pgo: latest_release_pgo_build,
         },
     }
 }
